@@ -21,6 +21,12 @@
  * clang -DUSEMAIN bit_vector.c
  * gcc -DUSEMAIN bit_vector.c
  *
+ * Making shared object:
+ * gcc -fPIC -c test.c 
+ * gcc -shared -Wl,-soname,libmystuff.so.1 -o libmystuff.so.1.0.1 test.o
+ * To use clang, substitute gcc with clang. Seems to work without any 
+ * change.
+ *
  * TODO: Run this through valgrind. I don't think I'm leaking memory
  * TODO: This implementation could probably do more error checking. It
  * does'nt validate the values being passed in.
