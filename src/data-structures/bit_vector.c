@@ -33,7 +33,17 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include "bit_vector.h"
+
+/**
+ * bit_vector data structure.
+ */
+typedef struct bit_vector {
+    // Bits for the bit vector
+    unsigned char* bits;
+
+    // Number of bits in the vector
+    unsigned int size;
+} bit_vector_t;
 
 /**
  * Helper function to calculate how many bytes I need
