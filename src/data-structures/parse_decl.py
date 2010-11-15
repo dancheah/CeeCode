@@ -22,6 +22,7 @@ f3 = "int* foobar(int* b);"
 f4 = "int* foobar(int* b, int* c);"
 f5 = "int* foobar(int* b, int* c, int* d);"
 f6 = "unsigned int* foobar(int* b, unsigned int* c, int* d);"
+f7 = "int foobar(bit_vector_t* bv);"
 
 def tokenize(str):
     """str -> Sequence(Token)
@@ -59,7 +60,15 @@ def parse(tokens):
     comma        = skip(t('Comma'))
     semicolon    = skip(t('SemiColon'))
 
-    udt      = name + many(star)
+    def collapse(x):
+        bp()
+        if len(x[1]) > 0:
+            # TODO: handle multiple stars
+            return Token("UserTypePointer", x[0].value + " " + x[1][0].value)
+        else:
+            return Token("UserType", x[0].value)
+
+    udt      = name + many(star) >> collapse
     prim     = (inttype | chartype | unsignedtype + inttype | unsignedtype + chartype ) + many(star)
     voidptr  = void + star + many(star)
 
@@ -74,3 +83,25 @@ def parse(tokens):
     funcdecl = rettype + name + lpar + arglist + rpar + semicolon
 
     return funcdecl.parse(tokens)
+
+
+def parse1(tokens):
+    """ 
+    Experimenting with collapsing part of the parse tree
+    to make it easier to work with.
+    """
+    t = lambda s: some(lambda tok: tok.type == s)
+
+    name         = t('Name')
+    star         = t('Star')
+
+    def collapse(x):
+        if len(x[1]) > 0:
+            # TODO: handle multiple stars
+            return Token("UserTypePointer", x[0].value + " " + x[1].value)
+        else:
+            return Token("UserType", x[0].value)
+
+    udt = name + many(star) >> collapse
+
+    return udt.parse(tokens)
