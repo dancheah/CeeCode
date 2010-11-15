@@ -20,16 +20,6 @@ f1 = "int foobar(void);"
 f2 = "int foobar(int a);"
 f3 = "int* foobar(int* b);"
 
-def tokenize(s):
-    """
-    str -> [Token]
-    This is the simple tokenize function from the
-    tutorial.
-    """
-    return list(Token(*t[0:4]) 
-                for t in generate_tokens(StringIO(s).readline)
-                if t[0] not in [token.NEWLINE])
-
 def tokenize1(str):
     """str -> Sequence(Token)
     This is the tokenize function inspired from the json
@@ -48,49 +38,26 @@ def tokenize1(str):
         ('Comma',     (r',',)),
         ('Star',      (r'\*',)),
     ]
-    useless = ['Space']
+    useless = ['Space', 0]
     t = make_tokenizer(specs)
     return [x for x in t(str) if x.type not in useless]
 
-def identifier(t):
-    pass
+def typeid(tokens):
+    t = lambda s: some(lambda tok: tok.type == s)
+    inttype      = t('Int')
+    chartype     = t('Char')
+    unsignedtype = t('Unsigned') 
+    name         = t('Name')
+    star         = t('Star')
+    void         = t('Void')
 
-def typeid(t):
-    'Sequence[Token] -> Token'
-    tokvalue = lambda t: some(lambda x: x.value == t)
-    void     = tokvalue("void")
-    inttype  = tokvalue("int")
-    chartype = tokvalue("char") 
-    unsigned = tokvalue("unsigned")
-    def make_unsigned(x):
-        if x[1].value == "int":
-            return Token(1, 'unsigned int')
-        else:
-            return Token(1, 'unsigned char')
+    udt      = name + many(star)
+    prim     = (inttype | chartype | unsignedtype) + many(star)
+    voidptr  = void + star + many(star)
 
-    tokstart = lambda t: some(lambda x: x.value.startswith(t))
+    accepted_types = voidptr | prim | udt
 
-    def ptr(tokens):
-        a = [ t.value for t in tokens ]
-        a = reduce(lambda x, y: x + y, a, '')
-        return Token(51, a)
-
-    star = many(tokstart('*')) >> ptr
-
-    unsignedint  = unsigned + inttype  >> make_unsigned
-    unsignedchar = unsigned + chartype >> make_unsigned
-    voidptr      = void + star 
-    primtypes    = unsignedint | unsignedchar | inttype | chartype
-    primtypesptr = primtypes + star
-
-    typeid =  voidptr | primtypesptr
-    
-# typeid = 'unsigned int' | 'unsigned char' | 'char' | 'int' | identfier followed by zero or more stars
-    return typeid.parse(t)
-
-
-
-# identifier = 
+    return accepted_types.parse(tokens)
 
 
 # funcdecl = typec identifier ( many(args) ) ;
