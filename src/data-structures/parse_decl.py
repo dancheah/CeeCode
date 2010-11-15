@@ -47,6 +47,10 @@ def tokenize(str):
     return [x for x in t(str) if x.type not in useless]
 
 def test_tokenize():
+    """ Test tokenize function. Use nosetests 
+        for testing from command line or ipython
+        to test from the REPL
+    """
     assert(tokenize(f1) == [Token('Int', 'int'),
                             Token('Name', 'foobar'),
                             Token('LPar', '('),
