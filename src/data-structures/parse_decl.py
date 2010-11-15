@@ -5,7 +5,7 @@ from re import VERBOSE
 import token
 from tokenize import generate_tokens
 #from funcparserlib.lexer import make_tokenizer, Token, LexerError
-from funcparserlib.lexer import Token
+from funcparserlib.lexer import Token, make_tokenizer
 from funcparserlib.parser import some, a, maybe, many, finished, skip, forward_decl, NoParseError
 from StringIO import StringIO
 from pprint import pformat
@@ -21,10 +21,39 @@ f2 = "int foobar(int a);"
 f3 = "int* foobar(int* b);"
 
 def tokenize(s):
-    'str -> [Token]'
+    """
+    str -> [Token]
+    This is the simple tokenize function from the
+    tutorial.
+    """
     return list(Token(*t[0:4]) 
                 for t in generate_tokens(StringIO(s).readline)
                 if t[0] not in [token.NEWLINE])
+
+def tokenize1(str):
+    """str -> Sequence(Token)
+    This is the tokenize function inspired from the json
+    example.
+    """
+    specs = [
+        ('Space',     (r'[ \t\r\n]+',)),
+        ('Int',       ('int',)),
+        ('Char',      ('char',)),
+        ('Unsigned',  ('unsigned',)),
+        ('Void',      ('void',)),
+        ('Name',      (r'[A-Za-z_][A-Za-z_0-9]*',)),
+        ('SemiColon', (r';',)),
+        ('LPar',      ('\(',)),
+        ('RPar',      ('\)',)),
+        ('Comma',     (r',',)),
+        ('Star',      (r'\*',)),
+    ]
+    useless = ['Space']
+    t = make_tokenizer(specs)
+    return [x for x in t(str) if x.type not in useless]
+
+def identifier(t):
+    pass
 
 def typeid(t):
     'Sequence[Token] -> Token'
