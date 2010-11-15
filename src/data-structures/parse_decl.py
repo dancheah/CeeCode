@@ -46,6 +46,14 @@ def tokenize(str):
     t = make_tokenizer(specs)
     return [x for x in t(str) if x.type not in useless]
 
+def test_tokenize():
+    assert(tokenize(f1) == [Token('Int', 'int'),
+                            Token('Name', 'foobar'),
+                            Token('LPar', '('),
+                            Token('Void', 'void'),
+                            Token('RPar', ')'),
+                            Token('SemiColon', ';')])
+
 def parse(tokens):
     t = lambda s: some(lambda tok: tok.type == s)
 
