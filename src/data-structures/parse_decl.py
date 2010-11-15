@@ -19,8 +19,11 @@ def bp():
 f1 = "int foobar(void);"
 f2 = "int foobar(int a);"
 f3 = "int* foobar(int* b);"
+f4 = "int* foobar(int* b, int* c);"
+f5 = "int* foobar(int* b, int* c, int* d);"
+f6 = "unsigned int* foobar(int* b, unsigned int* c, int* d);"
 
-def tokenize1(str):
+def tokenize(str):
     """str -> Sequence(Token)
     This is the tokenize function inspired from the json
     example.
@@ -42,25 +45,32 @@ def tokenize1(str):
     t = make_tokenizer(specs)
     return [x for x in t(str) if x.type not in useless]
 
-def typeid(tokens):
+def parse(tokens):
     t = lambda s: some(lambda tok: tok.type == s)
+
     inttype      = t('Int')
     chartype     = t('Char')
     unsignedtype = t('Unsigned') 
     name         = t('Name')
     star         = t('Star')
     void         = t('Void')
+    lpar         = skip(t('LPar'))
+    rpar         = skip(t('RPar'))
+    comma        = skip(t('Comma'))
+    semicolon    = skip(t('SemiColon'))
 
     udt      = name + many(star)
-    prim     = (inttype | chartype | unsignedtype) + many(star)
+    prim     = (inttype | chartype | unsignedtype + inttype | unsignedtype + chartype ) + many(star)
     voidptr  = void + star + many(star)
 
     accepted_types = voidptr | prim | udt
 
-    return accepted_types.parse(tokens)
+    # Return Type
+    rettype = void | accepted_types 
 
+    # Argument List
+    arglist = void | accepted_types + name + many(comma + accepted_types + name)
 
-# funcdecl = typec identifier ( many(args) ) ;
+    funcdecl = rettype + name + lpar + arglist + rpar + semicolon
 
-def parse_funcdecl(tok):
-    pass
+    return funcdecl.parse(tokens)
