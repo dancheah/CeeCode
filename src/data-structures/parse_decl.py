@@ -80,9 +80,27 @@ def parse(tokens):
         else:
             return Token("UserType", x[0].value)
 
+
+    def make_func(x):
+        return Token('Function', x.value)
+
+
+    def make_type(x):
+        if len(x) == 3: 
+            return Token("UnsignedTypePointer", x)
+        elif len(x) == 2: 
+            if x[0].type == "Unsigned":
+                return Token("UnsignedType", x)
+            else:
+                return Token("TypePointer", x)
+        else:
+            return Token("Type", x)
+
+
     udt      = name + many(star) >> collapse
-    prim     = (inttype | chartype | unsignedtype + inttype | unsignedtype + chartype ) + many(star)
+    prim     = (inttype | chartype | unsignedtype + inttype | unsignedtype + chartype ) + many(star) >> make_type
     voidptr  = void + star + many(star)
+    func     = name >> make_func
 
     accepted_types = voidptr | prim | udt
 
@@ -90,11 +108,14 @@ def parse(tokens):
     rettype = void | accepted_types 
 
     # Argument List
-    arglist = void | accepted_types + name + many(comma + accepted_types + name)
+    decl      = accepted_types + name
+    decl_list = decl + many(comma + decl)
 
-    funcdecl = rettype + name + lpar + arglist + rpar + semicolon
+    arg_list  = void | decl_list
 
-    return funcdecl.parse(tokens)
+    func_decl = rettype + func + lpar + arg_list + rpar + semicolon
+
+    return func_decl.parse(tokens)
 
 
 def parse1(tokens):
