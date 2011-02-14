@@ -18,7 +18,7 @@
 
 /*
  * To compile on my mac:
- * gcc -DUSEMAIN -Werror -std=c99 -pedantic -o arraytest arraytest.c (works on Ubuntu)
+ * gcc -DUSEMAIN -Werror -std=c99 -pedantic -o array array.c (works on Ubuntu)
  * clang -DUSEMAIN array.c
  *
  * TODO: Run valgrind.
