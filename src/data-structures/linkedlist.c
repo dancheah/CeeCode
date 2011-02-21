@@ -86,6 +86,8 @@ void insert_at_head(linkedlist_t* list, data_t newvalue)
     // Point to what head currently points at
     node->next = list->head;
 
+    // BUG: head needs to point back at me.
+
     // If the tail points to nothing, then we want
     // it to point to this new node. i.e. the list
     // is empty.
