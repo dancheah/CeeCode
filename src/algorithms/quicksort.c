@@ -1,5 +1,5 @@
 /*
- * insertion_sort.c: An insertion sort implementation
+ * quicksort.c: A quick sort implementation
  * Copyright (C) 2011 Daniel Cheah
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,41 +17,70 @@
  */ 
 
 /*
- * A little exercise I'm working on going through Jon Bentley's
- * Programming Pearls.
+ * Working through a quick sort exercise
  *
  * To compile on my mac:
- * gcc -DUSEMAIN -Werror -std=c99 -pedantic -o isort insertion_sort.c 
- * clang -DUSEMAIN insertion_sort.c
+ * gcc -DUSEMAIN -Werror -std=c99 -pedantic -o qsort quicksort.c 
+ * clang -DUSEMAIN quicksort.c
  */
 #include <stdio.h>
 #include <stdlib.h>
 
-// Basic implementation.
-void isort1(int elements, int* array)
+void swap(int *a, int *b)
 {
-    for (int i = 1; i < elements; ++i) {
-        for (int j = i; (j > 0) && (array[j - 1] > array[j]); --j) {
-            // Swap elements around
-            int tmp = array[j - 1];
-            array[j - 1] = array[j];
-            array[j] = tmp;
-        }
-    }
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
 }
 
-// More nuanced implementation. Slightly faster than isort1
-// because we don't do a swap.
-void isort2(int elements, int* array)
+/**
+ * qsort1 from programming pearls.
+ */
+void qsort1(int* array, int l, int u)
 {
-    for (int i = 1; i < elements; ++i) {
-        int t = array[i];
-        int j;
-        for (j = i; (j > 0) && (array[j - 1] > t); --j) {
-            array[j] = array[j - 1];
-        }
-        array[j] = t;
+    if (l >= u) {
+        return;
     }
+
+    int m = l;
+
+    for (int i = l + 1; i <= u; i++) {
+        if (array[i] < array[l]) {
+            ++m;
+            swap(&array[m], &array[i]);
+        }
+    }
+    swap(&array[m], &array[l]);
+
+    qsort1(array, l, m - 1);
+    qsort1(array, m + 1, u);
+}
+
+/**
+ * qsort3 from programming pearls.
+ */
+void qsort3(int* array, int l, int u)
+{
+    if (l >= u) {
+        return;
+    }
+
+    int t = array[l];
+    int i = l;
+    int j = u + 1;
+
+    while (1) {
+        do { ++i; } while ((i <= u) && (array[i] < t));
+        do { --j; } while (array[j] > t);
+        if (i > j) {
+            break;
+        }
+        swap(&array[i], &array[j]);
+    }
+    swap(&array[l], &array[j]);
+
+    qsort3(array, l, j - 1);
+    qsort3(array, j + 1, u);
 }
 
 #ifdef USEMAIN
@@ -80,7 +109,7 @@ int main(int argc, char** argv)
         printf("Before Sorting\n");
         print_array(elements, array);
 
-        isort2(elements, array);
+        qsort3(array, 0, elements - 1);
 
         printf("After Sorting\n");
         print_array(elements, array);
@@ -89,5 +118,3 @@ int main(int argc, char** argv)
     return 0;
 }
 #endif // USEMAIN
-
-// vim: sts=4 sw=4 ts=4 et ft=c
