@@ -1,5 +1,5 @@
 /*
- * insertion_sort.c: A simple permute function implementation
+ * insertion_sort.c: An insertion sort implementation
  * Copyright (C) 2011 Daniel Cheah
  *
  * This program is free software: you can redistribute it and/or modify
