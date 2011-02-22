@@ -118,3 +118,5 @@ int main(int argc, char** argv)
     return 0;
 }
 #endif // USEMAIN
+
+// vim: sts=4 sw=4 ts=4 et ft=c
